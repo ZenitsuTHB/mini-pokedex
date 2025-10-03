@@ -23,27 +23,27 @@ Debe incluir documentación, tests y buenas prácticas de desarrollo.
 ## 📂 Estructura de carpetas
 ```
   src/
-    api/               # cliente API (axios/fetch) + endpoints
+    api/                # cliente API (axios/fetch) + endpoints
         pokemon.ts
     app/
-        providers.tsx    # QueryClientProvider, ThemeProvider
+        providers.tsx   # QueryClientProvider, ThemeProvider
+    components/
+        UI/             # Button, Badge, Spinner, Card...
+        PokemonCard.tsx
+        SearchInput.tsx
+        TypeFilter.tsx
+    context/
+        Favorites.tsx   # (opcional) context for favorites
+    hooks/
+        useDebounce.ts
     pages/
         Home.tsx
         PokemonDetail.tsx
-    Components/
-      UI/              # Button, Badge, Spinner, Card...
-      PokemonCard.tsx
-      SearchInput.tsx
-      TypeFilter.tsx
-    hooks/
-        useDebounce.ts
-    context/
-        Favorites.tsx    # (opcional) context for favorites
     styles/
         globals.css
+    tests/
     utils/
         format.ts
-    tests/
     main.tsx
 ```
 
