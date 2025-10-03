@@ -22,29 +22,35 @@ Debe incluir documentación, tests y buenas prácticas de desarrollo.
 
 ## 📂 Estructura de carpetas
 ```
-src/
-  api/
-  app/
-  components/
-  context/
-  hooks/
-  pages/
-  styles/
-  tests/
-  utils/
+  src/
+    api/               # cliente API (axios/fetch) + endpoints
+        pokemon.ts
+    app/
+        providers.tsx    # QueryClientProvider, ThemeProvider
+    pages/
+        Home.tsx
+        PokemonDetail.tsx
+    Components/
+      UI/              # Button, Badge, Spinner, Card...
+      PokemonCard.tsx
+      SearchInput.tsx
+      TypeFilter.tsx
+    hooks/
+        useDebounce.ts
+    context/
+        Favorites.tsx    # (opcional) context for favorites
+    styles/
+        globals.css
+    utils/
+        format.ts
+    tests/
+    main.tsx
 ```
 
 ## ⚖️ Trade-offs
 - **TypeScript** aumenta curva de aprendizaje pero da calidad a largo plazo.
 - **React Query** agrega dependencia, pero simplifica mucho el manejo de datos de red.
 - **Tailwind** puede ser más verboso en JSX, pero acelera la maquetación.
-
-## 🚀 Posibles mejoras futuras
-- **PWA**: soporte offline con service worker.
-- **Accesibilidad (a11y)**: mejorar navegación por teclado y contraste.
-- **Animaciones**: framer-motion para transiciones suaves.
-- **Prefetching**: precargar detalles en hover para navegación instantánea.
-- **CI/CD**: GitHub Actions con build + tests automáticos.
 
 ---
 📌 Documento vivo: puede actualizarse conforme evolucione el proyecto.
