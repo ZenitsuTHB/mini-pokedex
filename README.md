@@ -12,6 +12,9 @@ Consume la [PokéAPI](https://pokeapi.co/) para mostrar los 50 primeros Pokémon
 - TailwindCSS (estilos)
 - Jest + React Testing Library (tests)
 
+## 🛠️ Tools
+- Chatgpt ֎
+
 ## 📦 Instalación y ejecución
 ```bash
 # Clonar el repo
