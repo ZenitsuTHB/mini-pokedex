@@ -1,73 +1,73 @@
-# React + TypeScript + Vite
+# Mini Pokédex
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Este proyecto es una **Mini Pokédex** construida con **React + TypeScript + Vite**.  
+Consume la [PokéAPI](https://pokeapi.co/) para mostrar los 50 primeros Pokémon con búsqueda, filtros, detalle y manejo de errores.  
 
-Currently, two official plugins are available:
+## 🚀 Tecnologías principales
+- React 18 + TypeScript
+- Vite
+- React Router
+- React Query (TanStack)
+- Axios
+- TailwindCSS (estilos)
+- Jest + React Testing Library (tests)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 📦 Instalación y ejecución
+```bash
+# Clonar el repo
+git clone https://github.com/usuario/mini-pokedex.git
+cd mini-pokedex
 
-## React Compiler
+# Instalar dependencias
+npm install
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+# Modo desarrollo
+npm run dev
 
-## Expanding the ESLint configuration
+# Build de producción
+npm run build
+npm run preview
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+# Ejecutar tests
+npm test
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## 📂 Estructura del proyecto
 ```
+src/
+  api/               # cliente API (axios/fetch)
+  app/               # providers (queryClient, theme)
+  components/        # UI + componentes reusables
+  context/           # favoritos (opcional)
+  hooks/             # hooks personalizados
+  pages/             # Home, PokemonDetail
+  styles/            # CSS/Tailwind
+  tests/             # tests unitarios
+  utils/             # helpers
+```
+
+## ✅ Funcionalidades
+- Listado de 50 Pokémon (imagen, nombre, tipos)
+- Búsqueda en vivo (insensible a mayúsculas, parcial)
+- Filtro por tipo (scroll horizontal si necesario)
+- Detalle del Pokémon: imagen, nombre, tipos, peso, altura
+- Botón volver en la página de detalle
+- Loading spinner y manejo de errores
+- **Opcional:** Favoritos persistentes en `localStorage`
+- **Opcional:** Animaciones, accesibilidad, PWA
+
+## 🧪 Tests
+- Lista muestra 50 Pokémon
+- Búsqueda filtra resultados correctamente
+- Filtro por tipo funcional
+- Página de detalle con información completa
+- Favoritos guardados en `localStorage`
+
+## 📖 Documentación adicional
+Consulta el archivo `ANALISI.md` para ver el análisis de arquitectura, decisiones técnicas y mejoras futuras.
+
+## 📦 Deploy
+El proyecto puede desplegarse en **Vercel**, **Netlify** o GitHub Pages.
+
+---
+👨‍💻 Desarrollado como parte del reto *Hackató - Mini Pokédex*.
