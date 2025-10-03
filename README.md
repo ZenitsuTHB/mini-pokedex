@@ -18,7 +18,7 @@ Consume la [PokéAPI](https://pokeapi.co/) para mostrar los 50 primeros Pokémon
 ## 📦 Instalación y ejecución
 ```bash
 # Clonar el repo
-git clone https://github.com/usuario/mini-pokedex.git
+git clone git@github.com:ZenitsuTHB/mini-pokedex.git
 cd mini-pokedex
 
 # Instalar dependencias
