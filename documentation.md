@@ -119,10 +119,10 @@ export default function App() {
 ---
 
 ## ✅ Checklist rápido
-- [ ] `npm install -D tailwindcss postcss autoprefixer`
-- [ ] `npx tailwindcss init -p`
-- [ ] `tailwind.config.cjs` actualizado
+- [x] `npm install -D tailwindcss postcss autoprefixer`
+- [x] `npx tailwindcss init -p`
+- [x] `tailwind.config.cjs` actualizado
 - [ ] `postcss.config.cjs` correcto
-- [ ] `src/index.css` con @tailwind
-- [ ] `import './index.css'` en `main.tsx`
+- [x] `src/index.css` con @tailwind
+- [x] `import './index.css'` en `main.tsx`
 - [ ] Dev server funcionando
