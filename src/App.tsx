@@ -60,6 +60,12 @@ function App() {
   // Estado para cargar detalles de un Pokémon específico
   const [loadingDetail, setLoadingDetail] = useState(false)
 
+  // Estado para los Pokémon favoritos (almacena los IDs)
+  const [favorites, setFavorites] = useState<number[]>([])
+
+  // Estado para mostrar solo favoritos
+  const [showFavoritesOnly, setShowFavoritesOnly] = useState(false)
+
   // === FUNCIÓN PRINCIPAL PARA OBTENER DATOS ===
   const fetchPokemonList = async () => {
     try {
@@ -151,8 +157,20 @@ function App() {
   const filteredPokemon = pokemonList.filter(pokemon => {
     const matchesSearch = pokemon.name.toLowerCase().includes(search.toLowerCase())
     const matchesType = selectedType === '' || pokemon.types.some(type => type.type.name === selectedType)
-    return matchesSearch && matchesType
+    const matchesFavorites = !showFavoritesOnly || favorites.includes(pokemon.id)
+    return matchesSearch && matchesType && matchesFavorites
   })
+
+  // === FUNCIONES PARA MANEJAR FAVORITOS ===
+  const toggleFavorite = (pokemonId: number) => {
+    setFavorites(prev => 
+      prev.includes(pokemonId) 
+        ? prev.filter(id => id !== pokemonId)
+        : [...prev, pokemonId]
+    )
+  }
+
+  const isFavorite = (pokemonId: number) => favorites.includes(pokemonId)
 
   // === EXTRAER TIPOS ÚNICOS COMO BACKUP ===
   // Si availableTypes está vacío, extraemos los tipos directamente
@@ -180,6 +198,41 @@ function App() {
 
           {/* Tarjeta de detalle */}
           <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
+
+            {/* === HEADER CON TÍTULO Y ESTRELLA ALINEADOS === */}
+            <div className="flex items-center justify-between p-6 border-b border-gray-100">
+              {/* Espacio izquierdo para equilibrar */}
+              <div className="w-12"></div>
+              
+              {/* Título centrado */}
+              <div className="flex-1 text-center">
+                <span className="text-lg text-gray-500 font-mono block mb-1">
+                  #{selectedPokemon.id.toString().padStart(3, '0')}
+                </span>
+                <h1 className="text-4xl font-display font-bold text-gray-800 capitalize">
+                  {selectedPokemon.name}
+                </h1>
+              </div>
+              
+              {/* Estrella destacada */}
+              <button
+                onClick={() => toggleFavorite(selectedPokemon.id)}
+                className={`w-12 h-12 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center transform hover:scale-110 ${
+                  isFavorite(selectedPokemon.id) 
+                    ? 'bg-gradient-to-r from-yellow-300 to-yellow-400 border-2 border-yellow-500 shadow-yellow-200' 
+                    : 'bg-white border-2 border-gray-200 hover:border-gray-300'
+                }`}
+              >
+                <span className={`text-2xl transition-all duration-300 ${
+                  isFavorite(selectedPokemon.id) 
+                    ? 'text-yellow-700 drop-shadow-sm' 
+                    : 'text-gray-400'
+                }`}>
+                  ⭐
+                </span>
+              </button>
+            </div>
+
             {/* Sección de imagen */}
             <div className="bg-gradient-to-br from-gray-50 to-gray-100 p-8 text-center">
               <img
@@ -192,15 +245,9 @@ function App() {
             {/* Sección de información */}
             <div className="p-8">
               <div className="text-center mb-6">
-                <span className="text-lg text-gray-500 font-mono">
-                  #{selectedPokemon.id.toString().padStart(3, '0')}
-                </span>
-                <h1 className="text-4xl font-display font-bold text-gray-800 capitalize mb-4">
-                  {selectedPokemon.name}
-                </h1>
 
                 {/* Tipos */}
-                <div className="flex justify-center gap-3 mb-6">
+                <div className="flex justify-center gap-3 mb-8">
                   {selectedPokemon.types.map((type, index) => (
                     <span
                       key={index}
@@ -317,8 +364,36 @@ function App() {
           {/* === FILTRO POR TIPO === */}
           <div className="mt-6">
             <h3 className="text-blue-100 text-sm font-semibold mb-3">Filtrar per tipus:</h3>
+            
+            {/* === BOTONES TODOS Y FAVORITOS === */}
+            <div className="flex gap-3 justify-center mb-4">
+              <button
+                onClick={() => setShowFavoritesOnly(false)}
+                className={`px-6 py-2 rounded-full text-sm font-semibold transition-all duration-200 ${
+                  !showFavoritesOnly 
+                    ? 'bg-white text-blue-600 shadow-lg' 
+                    : 'bg-blue-300 text-white hover:bg-white hover:text-blue-600'
+                }`}
+              >
+                Tots els Pokémon
+              </button>
+              <button
+                onClick={() => setShowFavoritesOnly(true)}
+                className={`px-6 py-2 rounded-full text-sm font-semibold transition-all duration-200 flex items-center gap-2 ${
+                  showFavoritesOnly 
+                    ? 'bg-white text-blue-600 shadow-lg' 
+                    : favorites.length > 0
+                      ? 'bg-gradient-to-r from-yellow-400 to-yellow-500 text-white shadow-lg hover:from-yellow-500 hover:to-yellow-600 border-2 border-yellow-300'
+                      : 'bg-blue-300 text-white hover:bg-white hover:text-blue-600'
+                }`}
+              >
+                <span className={favorites.length > 0 && !showFavoritesOnly ? 'animate-pulse' : ''}>⭐</span>
+                Favorits ({favorites.length})
+              </button>
+            </div>
+
             <div className="flex gap-2 overflow-x-auto pb-2 justify-center">
-              {/* Botón "Todos" */}
+              {/* Botón "Todos" los tipos */}
               <button
                 onClick={() => setSelectedType('')}
                 className={`px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-all duration-200 ${
@@ -327,7 +402,7 @@ function App() {
                     : 'bg-blue-400 text-white hover:bg-blue-300 hover:underline hover:decoration-2 hover:underline-offset-2'
                 }`}
               >
-                Tots
+                Tots els tipus
               </button>
               
               {/* Botones de tipos */}
@@ -361,19 +436,26 @@ function App() {
             - xl: 5 columnas */}
         
         {/* Verificamos si hay Pokémon que coincidan con la búsqueda */}
-        {filteredPokemon.length === 0 && (search.trim() !== '' || selectedType !== '') ? (
+        {filteredPokemon.length === 0 && (search.trim() !== '' || selectedType !== '' || showFavoritesOnly) ? (
           // Mensaje cuando no se encuentran coincidencias
           <div className="text-center py-12">
             <div className="bg-white rounded-xl shadow-lg p-8 mx-auto max-w-md">
               <h3 className="text-xl font-display font-bold text-gray-800 mb-2">
-                No s'han trobat pokémons
+                {showFavoritesOnly && favorites.length === 0 
+                  ? "No tens favorits"
+                  : "No s'han trobat pokémons"
+                }
               </h3>
               <p className="text-gray-600">
-                {search.trim() !== '' && selectedType !== '' 
-                  ? `No hi ha cap pokémon que coincideixi amb "${search}" del tipus ${selectedType}`
-                  : search.trim() !== '' 
-                    ? `No hi ha cap pokémon que coincideixi amb "${search}"`
-                    : `No hi ha cap pokémon del tipus ${selectedType}`
+                {showFavoritesOnly && favorites.length === 0 
+                  ? "Afegeix alguns Pokémon als teus favorits fent clic a l'estrella ⭐"
+                  : showFavoritesOnly
+                    ? `No hi ha favorits que coincideixin amb els filtres aplicats`
+                    : search.trim() !== '' && selectedType !== '' 
+                      ? `No hi ha cap pokémon que coincideixi amb "${search}" del tipus ${selectedType}`
+                      : search.trim() !== '' 
+                        ? `No hi ha cap pokémon que coincideixi amb "${search}"`
+                        : `No hi ha cap pokémon del tipus ${selectedType}`
                 }
               </p>
             </div>
@@ -384,8 +466,29 @@ function App() {
             {filteredPokemon.map((pokemon) => (
             <div
               key={pokemon.id} // Key único para React
-              className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 overflow-hidden"
+              className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 overflow-hidden relative"
             >
+              
+              {/* === BOTÓN DE FAVORITO === */}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation() // Evita que se active el detalle del Pokémon
+                  toggleFavorite(pokemon.id)
+                }}
+                className={`absolute top-3 right-3 z-10 w-9 h-9 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center transform hover:scale-110 ${
+                  isFavorite(pokemon.id)
+                    ? 'bg-gradient-to-r from-yellow-300 to-yellow-400 border-2 border-yellow-500 shadow-yellow-200'
+                    : 'bg-white border-2 border-gray-200 hover:border-gray-300'
+                }`}
+              >
+                <span className={`text-lg transition-all duration-300 ${
+                  isFavorite(pokemon.id) 
+                    ? 'text-yellow-700 drop-shadow-sm' 
+                    : 'text-gray-300 hover:text-gray-400'
+                }`}>
+                  ⭐
+                </span>
+              </button>
               
               {/* === SECCIÓN DE IMAGEN === */}
               <div className="bg-gradient-to-br from-gray-50 to-gray-100 p-4 flex justify-center">
@@ -446,8 +549,10 @@ function App() {
         <footer className="text-center py-8 text-blue-100">
           <p>
             Mostrando {filteredPokemon.length} Pokémon
-            {(search.trim() !== '' || selectedType !== '') && ` (filtrados de ${pokemonList.length})`}
+            {showFavoritesOnly ? ' favorits' : ''}
+            {(search.trim() !== '' || selectedType !== '' || showFavoritesOnly) && ` (de ${pokemonList.length} totals)`}
             {selectedType !== '' && ` - Tipus: ${selectedType}`}
+            {favorites.length > 0 && !showFavoritesOnly && ` | ${favorites.length} favorits`}
           </p>
         </footer>
       </div>
