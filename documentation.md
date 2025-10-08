@@ -14,7 +14,16 @@ npm install -D tailwindcss postcss autoprefixer
 ```bash
 npx tailwindcss init -p
 or ./node_modules/.bin/tailwindcss init -p
+
 ```
+if not working, check the tailwindcss version 
+
+```
+cat /home/$USER/.npm/_logs/2025-10-08T01_44_32_802Z-debug-0.log
+
+```
+if version is 4, create `tailwind.config.js` manually.
+
 
 ### 3. Configurar `tailwind.config.cjs`
 ```js

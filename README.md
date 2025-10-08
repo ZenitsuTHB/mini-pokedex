@@ -1,7 +1,8 @@
 # Mini Pokédex
 
 Este proyecto es una **Mini Pokédex** construida con **React + TypeScript + Vite**.  
-Consume la [PokéAPI](https://pokeapi.co/) para mostrar los 50 primeros Pokémon con búsqueda, filtros, detalle y manejo de errores.  
+Consume la [PokéAPI](https://pokeapi.co/) para mostrar los 50 primeros Pokémon con búsqueda, 
+filtros, detalle y manejo de errores.  
 
 ## 🚀 Tecnologías principales
 - React 18 + TypeScript
