@@ -1,6 +1,3 @@
-// === TYPE FILTER COMPONENT ===
-// Componente reutilizable para filtrar por tipos de Pokemon
-
 import { usePokemon, useFavorites } from '../context'
 
 export function TypeFilter() {
@@ -12,12 +9,10 @@ export function TypeFilter() {
 
   return (
     <div className="space-y-4">
-      {/* === TÍTULO === */}
       <h3 className="text-blue-100 text-sm font-semibold mb-3">
-        Filtrar per tipus:
+        Filtrar por tipo:
       </h3>
       
-      {/* === BOTONES TODOS Y FAVORITOS === */}
       <div className="flex gap-3 justify-center mb-4">
         <button
           onClick={() => pokemonActions.setShowFavoritesOnly(false)}
@@ -27,7 +22,7 @@ export function TypeFilter() {
               : 'bg-blue-300 text-white hover:bg-white hover:text-blue-600'
           }`}
         >
-          Tots els Pokémon
+          Todos los Pokémon
         </button>
         
         <button
@@ -42,13 +37,11 @@ export function TypeFilter() {
           disabled={favoriteIds.length === 0}
         >
           <span className={favoriteIds.length > 0 && !showFavoritesOnly ? 'animate-pulse' : ''}>⭐</span>
-          Favorits ({favoriteIds.length})
+          Favoritos ({favoriteIds.length})
         </button>
       </div>
 
-      {/* === FILTROS DE TIPO === */}
       <div className="flex gap-2 overflow-x-auto pb-2 justify-center">
-        {/* Botón "Todos" los tipos */}
         <button
           onClick={() => pokemonActions.setSelectedType('')}
           className={`px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-all duration-200 ${
@@ -57,10 +50,9 @@ export function TypeFilter() {
               : 'bg-blue-400 text-white hover:bg-blue-300 hover:underline hover:decoration-2 hover:underline-offset-2'
           }`}
         >
-          Tots els tipus
+          Todos los tipos
         </button>
         
-        {/* Botones de tipos */}
         {availableTypes.length > 0 ? (
           availableTypes.map((type) => (
             <button
@@ -76,11 +68,10 @@ export function TypeFilter() {
             </button>
           ))
         ) : (
-          <span className="text-blue-100 text-sm">Carregant tipus...</span>
+          <span className="text-blue-100 text-sm">Cargando tipos...</span>
         )}
       </div>
 
-      {/* === INDICADOR DE FILTROS ACTIVOS === */}
       {(selectedType || showFavoritesOnly) && (
         <div className="text-center">
           <div className="inline-flex items-center gap-2 bg-blue-500 bg-opacity-50 text-blue-100 px-3 py-1 rounded-full text-xs">

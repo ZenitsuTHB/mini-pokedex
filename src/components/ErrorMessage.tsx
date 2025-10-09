@@ -1,6 +1,3 @@
-// === ERROR MESSAGE COMPONENT ===
-// Componente reutilizable para mostrar errores
-
 interface ErrorMessageProps {
   message: string
   onRetry?: () => void
@@ -22,7 +19,6 @@ export function ErrorMessage({
   return (
     <div className={containerClasses}>
       <div className="text-center">
-        {/* === ICONO DE ERROR === */}
         <div className="mb-4">
           <div className={`w-16 h-16 mx-auto rounded-full ${fullScreen ? 'bg-white bg-opacity-20' : 'bg-red-100'} flex items-center justify-center`}>
             <svg 
@@ -41,17 +37,14 @@ export function ErrorMessage({
           </div>
         </div>
 
-        {/* === TÍTULO === */}
         <h2 className={`text-2xl font-display font-bold mb-4 ${textColor}`}>
           ¡Oops!
         </h2>
 
-        {/* === MENSAJE === */}
         <p className={`text-lg mb-6 ${textColor}`}>
           {message}
         </p>
 
-        {/* === BOTÓN DE REINTENTAR === */}
         {onRetry && (
           <button 
             onClick={onRetry}
@@ -65,7 +58,6 @@ export function ErrorMessage({
           </button>
         )}
 
-        {/* === CONSEJOS === */}
         {fullScreen && (
           <div className="mt-6 text-red-100 text-sm">
             <p>Verifica tu conexión a internet</p>

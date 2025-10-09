@@ -1,6 +1,3 @@
-// === POKEMON CARD COMPONENT ===
-// Componente reutilizable para mostrar información de un Pokemon
-
 import { useNavigate } from 'react-router-dom'
 import type { Pokemon } from '../api'
 import { convertHeight, convertWeight, formatPokemonId } from '../api'
@@ -26,7 +23,7 @@ export function PokemonCard({ pokemon, onClick }: PokemonCardProps) {
   }
 
   const handleFavoriteClick = (e: React.MouseEvent) => {
-    e.stopPropagation() // Evita que se active el click de la tarjeta
+    e.stopPropagation()
     favoritesActions.toggleFavorite(pokemon.id)
   }
 
@@ -35,7 +32,6 @@ export function PokemonCard({ pokemon, onClick }: PokemonCardProps) {
       className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer transform hover:scale-105 relative overflow-hidden group"
       onClick={handleCardClick}
     >
-      {/* === BOTÓN DE FAVORITO === */}
       <button
         onClick={handleFavoriteClick}
         className={`absolute top-3 right-3 z-10 w-9 h-9 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center transform hover:scale-110 ${
@@ -53,7 +49,6 @@ export function PokemonCard({ pokemon, onClick }: PokemonCardProps) {
         </span>
       </button>
 
-      {/* === IMAGEN DEL POKEMON === */}
       <div className="p-6 text-center">
         <div className="mb-4 relative">
           <img
@@ -68,7 +63,6 @@ export function PokemonCard({ pokemon, onClick }: PokemonCardProps) {
           />
         </div>
 
-        {/* === INFORMACIÓN BÁSICA === */}
         <div className="space-y-2">
           <span className="text-sm text-gray-500 font-mono block">
             #{formatPokemonId(pokemon.id)}
@@ -78,7 +72,6 @@ export function PokemonCard({ pokemon, onClick }: PokemonCardProps) {
             {pokemon.name}
           </h3>
 
-          {/* === TIPOS === */}
           <div className="flex gap-2 justify-center flex-wrap">
             {pokemon.types.map((typeInfo, index) => (
               <span
@@ -90,7 +83,6 @@ export function PokemonCard({ pokemon, onClick }: PokemonCardProps) {
             ))}
           </div>
 
-          {/* === ESTADÍSTICAS BÁSICAS === */}
           <div className="grid grid-cols-2 gap-4 mt-4 text-sm text-gray-600">
             <div>
               <span className="block font-medium">Altura</span>
@@ -104,13 +96,11 @@ export function PokemonCard({ pokemon, onClick }: PokemonCardProps) {
         </div>
       </div>
 
-      {/* === HOVER EFFECT === */}
       <div className="absolute inset-0 bg-gradient-to-t from-blue-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
     </div>
   )
 }
 
-// === FUNCIÓN HELPER PARA COLORES DE TIPOS ===
 function getTypeColor(type: string): string {
   const typeColors: Record<string, string> = {
     normal: 'bg-gray-400',

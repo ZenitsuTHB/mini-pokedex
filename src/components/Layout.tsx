@@ -1,6 +1,3 @@
-// === LAYOUT COMPONENT ===
-// Layout principal con navegación
-
 import { Outlet, useLocation } from 'react-router-dom'
 
 export function Layout() {
@@ -9,7 +6,6 @@ export function Layout() {
 
   return (
     <div className="min-h-screen">
-      {/* === NAVEGACIÓN === */}
       {!isHomePage && (
         <nav className="bg-cc42-blue shadow-lg">
           <div className="container mx-auto px-4 py-3">
@@ -18,7 +14,6 @@ export function Layout() {
                 Mini Pokédex
               </h1>
               
-              {/* Breadcrumb simple */}
               <div className="text-blue-100 text-sm">
                 <span>Inicio</span>
                 {location.pathname.includes('/pokemon/') && (
@@ -33,7 +28,6 @@ export function Layout() {
         </nav>
       )}
 
-      {/* === CONTENIDO PRINCIPAL === */}
       <main>
         <Outlet />
       </main>

@@ -1,6 +1,3 @@
-// === SEARCH INPUT COMPONENT ===
-// Componente reutilizable para la barra de búsqueda
-
 import { usePokemon } from '../context'
 
 interface SearchInputProps {
@@ -24,7 +21,6 @@ export function SearchInput({
 
   return (
     <div className={`relative ${className}`}>
-      {/* === INPUT PRINCIPAL === */}
       <input
         type="text"
         placeholder={placeholder}
@@ -33,11 +29,9 @@ export function SearchInput({
         className="w-full px-4 py-3 pl-12 pr-10 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all duration-200 text-gray-700 placeholder-gray-400"
       />
 
-      {/* === ICONO DE BÚSQUEDA === */}
       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
         <svg 
           className="w-5 h-5 text-gray-400" 
-          fill="none" 
           stroke="currentColor" 
           viewBox="0 0 24 24"
         >
@@ -50,7 +44,6 @@ export function SearchInput({
         </svg>
       </div>
 
-      {/* === BOTÓN LIMPIAR === */}
       {state.searchTerm && (
         <button
           onClick={handleClear}
@@ -72,7 +65,6 @@ export function SearchInput({
         </button>
       )}
 
-      {/* === INDICADOR DE RESULTADOS === */}
       {state.searchTerm && (
         <div className="absolute top-full left-0 mt-1 text-xs text-gray-500">
           {state.filteredPokemon.length} resultado(s) encontrado(s)

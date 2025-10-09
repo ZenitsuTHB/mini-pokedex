@@ -1,6 +1,3 @@
-// === LOADING SPINNER COMPONENT ===
-// Componente reutilizable para estados de carga
-
 interface LoadingSpinnerProps {
   message?: string
   size?: 'small' | 'medium' | 'large'
@@ -32,15 +29,12 @@ export function LoadingSpinner({
   return (
     <div className={containerClasses}>
       <div className="text-center">
-        {/* === SPINNER === */}
         <div className={`${sizeClasses[size]} border-4 border-white border-t-transparent rounded-full animate-spin mx-auto mb-4`}></div>
         
-        {/* === MENSAJE === */}
         <div className={`text-white ${textSizes[size]} font-display`}>
           {message}
         </div>
 
-        {/* === INDICADOR DE POKÉMON === */}
         {fullScreen && (
           <div className="mt-4 text-blue-100 text-lg">
             Preparando tu Pokédex...
