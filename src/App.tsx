@@ -1,29 +1,36 @@
 // === IMPORTS ===
-// Importamos los hooks de Context API en lugar de useState locales
+// Importamos los hooks de Context API y los nuevos componentes
 import './App.css'
 
 // === DEBUG TEMPORAL ===
 import './debug-api'
 
 // === IMPORTAR CONTEXT HOOKS ===
-// Ahora usamos Context API para el estado global
 import { 
   usePokemon,
   useFavorites,
   useSelectedPokemon
 } from './context'
 
+// === IMPORTAR COMPONENTES REUTILIZABLES ===
+import {
+  PokemonCard,
+  SearchInput,
+  TypeFilter,
+  LoadingSpinner,
+  ErrorMessage
+} from './components'
+
 // === IMPORTAR UTILIDADES DE LA API ===
 import { 
   convertHeight,
   convertWeight,
-  formatPokemonId,
-  type Pokemon
+  formatPokemonId
 } from './api'
 
 function App() {
   // === USAR CONTEXT HOOKS ===
-  // Reemplazamos useState locales con hooks del Context API
+  // Reemplazamos useState locales with hooks del Context API
   const { state: pokemonState, actions: pokemonActions } = usePokemon()
   const { state: favoritesState, actions: favoritesActions } = useFavorites()
   const { state: selectedPokemonState, actions: selectedPokemonActions } = useSelectedPokemon()
@@ -32,7 +39,6 @@ function App() {
   const {
     pokemonList,
     filteredPokemon,
-    availableTypes,
     loading,
     error,
     searchTerm,
@@ -44,17 +50,14 @@ function App() {
   const { selectedPokemon } = selectedPokemonState
 
   // === RENDERIZADO CONDICIONAL: ESTADO DE CARGA ===
-  // Si estamos cargando, mostramos un spinner elegante
+  // Si estamos cargando, mostramos el spinner elegante
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-white border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <div className="text-white text-2xl font-display">
-            Cargando Pokémon...
-          </div>
-        </div>
-      </div>
+      <LoadingSpinner 
+        fullScreen 
+        message="Cargando Pokémon..." 
+        size="large"
+      />
     )
   }
 
@@ -62,18 +65,11 @@ function App() {
   // Si hay un error, mostramos mensaje de error con botón para reintentar
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-red-500 to-pink-600 flex items-center justify-center">
-        <div className="text-white text-center">
-          <h2 className="text-2xl font-display mb-4">¡Oops!</h2>
-          <p className="text-lg">{error}</p>
-          <button 
-            onClick={pokemonActions.refreshData} // Usar action del context
-            className="mt-4 px-6 py-2 bg-white text-red-600 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
-          >
-            Reintentar
-          </button>
-        </div>
-      </div>
+      <ErrorMessage
+        message={error}
+        onRetry={pokemonActions.refreshData}
+        fullScreen
+      />
     )
   }
 
@@ -238,78 +234,15 @@ function App() {
           </p>
           {/* === CAMPO DE BÚSQUEDA === */}
           <div className="mt-4">
-            <input
-              type="text"
+            <SearchInput 
               placeholder="Buscar Pokémon..."
-              value={searchTerm}
-              onChange={(e) => pokemonActions.setSearchTerm(e.target.value)}
-              className="w-full max-w-xs px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              className="w-full max-w-xs"
             />
           </div>
 
           {/* === FILTRO POR TIPO === */}
           <div className="mt-6">
-            <h3 className="text-blue-100 text-sm font-semibold mb-3">Filtrar per tipus:</h3>
-            
-            {/* === BOTONES TODOS Y FAVORITOS === */}
-            <div className="flex gap-3 justify-center mb-4">
-              <button
-                onClick={() => pokemonActions.setShowFavoritesOnly(false)}
-                className={`px-6 py-2 rounded-full text-sm font-semibold transition-all duration-200 ${
-                  !showFavoritesOnly 
-                    ? 'bg-white text-blue-600 shadow-lg' 
-                    : 'bg-blue-300 text-white hover:bg-white hover:text-blue-600'
-                }`}
-              >
-                Tots els Pokémon
-              </button>
-              <button
-                onClick={() => pokemonActions.setShowFavoritesOnly(true)}
-                className={`px-6 py-2 rounded-full text-sm font-semibold transition-all duration-200 flex items-center gap-2 ${
-                  showFavoritesOnly 
-                    ? 'bg-white text-blue-600 shadow-lg' 
-                    : favoriteIds.length > 0
-                      ? 'bg-gradient-to-r from-yellow-400 to-yellow-500 text-white shadow-lg hover:from-yellow-500 hover:to-yellow-600 border-2 border-yellow-300'
-                      : 'bg-blue-300 text-white hover:bg-white hover:text-blue-600'
-                }`}
-              >
-                <span className={favoriteIds.length > 0 && !showFavoritesOnly ? 'animate-pulse' : ''}>⭐</span>
-                Favorits ({favoriteIds.length})
-              </button>
-            </div>
-
-            <div className="flex gap-2 overflow-x-auto pb-2 justify-center">
-              {/* Botón "Todos" los tipos */}
-              <button
-                onClick={() => pokemonActions.setSelectedType('')}
-                className={`px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-all duration-200 ${
-                  selectedType === '' 
-                    ? 'bg-white text-blue-600 underline decoration-2 underline-offset-2' 
-                    : 'bg-blue-400 text-white hover:bg-blue-300 hover:underline hover:decoration-2 hover:underline-offset-2'
-                }`}
-              >
-                Tots els tipus
-              </button>
-              
-              {/* Botones de tipos */}
-              {availableTypes.length > 0 ? (
-                availableTypes.map((type) => (
-                  <button
-                    key={type}
-                    onClick={() => pokemonActions.setSelectedType(type)}
-                    className={`px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-all duration-200 capitalize ${
-                      selectedType === type 
-                        ? 'bg-white text-blue-600 underline decoration-2 underline-offset-2' 
-                        : 'bg-blue-400 text-white hover:bg-blue-300 hover:underline hover:decoration-2 hover:underline-offset-2'
-                    }`}
-                  >
-                    {type}
-                  </button>
-                ))
-              ) : (
-                <span className="text-blue-100 text-sm">Carregant tipus...</span>
-              )}
-            </div>
+            <TypeFilter />
           </div>
         </header>
 
@@ -348,88 +281,14 @@ function App() {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-            {/* Iteramos sobre cada Pokémon filtrado y creamos una tarjeta */}
+            {/* Iteramos sobre cada Pokémon filtrado y usamos nuestro componente reutilizable */}
             {filteredPokemon.map((pokemon) => (
-            <div
-              key={pokemon.id} // Key único para React
-              className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 overflow-hidden relative"
-            >
-              
-              {/* === BOTÓN DE FAVORITO === */}
-              <button
-                onClick={(e) => {
-                  e.stopPropagation() // Evita que se active el detalle del Pokémon
-                  favoritesActions.toggleFavorite(pokemon.id)
-                }}
-                className={`absolute top-3 right-3 z-10 w-9 h-9 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center transform hover:scale-110 ${
-                  favoritesActions.isFavorite(pokemon.id)
-                    ? 'bg-gradient-to-r from-yellow-300 to-yellow-400 border-2 border-yellow-500 shadow-yellow-200'
-                    : 'bg-white border-2 border-gray-200 hover:border-gray-300'
-                }`}
-              >
-                <span className={`text-lg transition-all duration-300 ${
-                  favoritesActions.isFavorite(pokemon.id) 
-                    ? 'text-yellow-700 drop-shadow-sm' 
-                    : 'text-gray-300 hover:text-gray-400'
-                }`}>
-                  ⭐
-                </span>
-              </button>
-              
-              {/* === SECCIÓN DE IMAGEN === */}
-              <div className="bg-gradient-to-br from-gray-50 to-gray-100 p-4 flex justify-center">
-                <img
-                  src={pokemon.sprites.front_default} // URL de la imagen del Pokémon
-                  alt={pokemon.name}                  // Texto alternativo para accesibilidad
-                  className="w-24 h-24 object-contain" // Tamaño fijo y contener imagen
-                  loading="lazy"                      // Carga perezosa para mejor rendimiento
-                />
-              </div>
-              
-              {/* === SECCIÓN DE INFORMACIÓN === */}
-              <div className="p-4">
-                <div className="text-center">
-                  
-                  {/* Número del Pokémon con formato (ej: #001, #025) */}
-                  {/* 🚀 NUEVA LÓGICA: Usamos función de formateo de nuestra API */}
-                  <span className="text-sm text-gray-500 font-mono">
-                    #{formatPokemonId(pokemon.id)}
-                  </span>
-                  
-                  {/* Nombre del Pokémon capitalizado */}
-                  <h3 className="text-xl font-display font-bold text-gray-800 capitalize mb-2">
-                    {pokemon.name}
-                  </h3>
-                  
-                  {/* === TIPOS DEL POKÉMON === */}
-                  <div className="flex justify-center gap-2 flex-wrap">
-                    {/* Iteramos sobre cada tipo y creamos una pill/badge */}
-                    {pokemon.types.map((type, index) => (
-                      <span
-                        key={index}
-                        className={`px-3 py-1 rounded-full text-xs font-semibold text-white
-                          ${getTypeColor(type.type.name)} // Función que devuelve color según el tipo
-                        `}
-                      >
-                        {type.type.name}
-                      </span>
-                    ))}
-                  </div>
-                  
-                  {/* === BOTÓN AZUL === */}
-                  <div className="mt-3">
-                    <button 
-                      onClick={() => selectedPokemonActions.selectPokemon(pokemon)}
-                      className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-2 rounded-lg transition-colors duration-200"
-                    >
-                      Ver Detalles
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
+              <PokemonCard 
+                key={pokemon.id}
+                pokemon={pokemon}
+              />
+            ))}
+          </div>
         )}
 
         {/* === FOOTER === */}
@@ -447,33 +306,28 @@ function App() {
   )
 }
 
-// === FUNCIÓN HELPER PARA COLORES DE TIPOS ===
-// Esta función devuelve una clase CSS de Tailwind según el tipo de Pokémon
-// Cada tipo tiene un color característico que coincide con los juegos oficiales
+// === FUNCIÓN HELPER TEMPORAL PARA COLORES DE TIPOS ===
 function getTypeColor(type: string): string {
-  // Objeto que mapea cada tipo con su color correspondiente
   const colors: { [key: string]: string } = {
-    normal: 'bg-gray-400',      // Gris para tipo normal
-    fire: 'bg-red-500',         // Rojo para tipo fuego
-    water: 'bg-blue-500',       // Azul para tipo agua
-    electric: 'bg-yellow-400',  // Amarillo para tipo eléctrico
-    grass: 'bg-green-500',      // Verde para tipo planta
-    ice: 'bg-blue-200',         // Azul claro para tipo hielo
-    fighting: 'bg-red-700',     // Rojo oscuro para tipo lucha
-    poison: 'bg-purple-500',    // Morado para tipo veneno
-    ground: 'bg-yellow-600',    // Amarillo oscuro para tipo tierra
-    flying: 'bg-indigo-400',    // Índigo para tipo volador
-    psychic: 'bg-pink-500',     // Rosa para tipo psíquico
-    bug: 'bg-green-400',        // Verde claro para tipo bicho
-    rock: 'bg-yellow-800',      // Amarillo muy oscuro para tipo roca
-    ghost: 'bg-purple-700',     // Morado oscuro para tipo fantasma
-    dragon: 'bg-indigo-700',    // Índigo oscuro para tipo dragón
-    dark: 'bg-gray-800',        // Gris muy oscuro para tipo siniestro
-    steel: 'bg-gray-500',       // Gris medio para tipo acero
-    fairy: 'bg-pink-300'        // Rosa claro para tipo hada
+    normal: 'bg-gray-400',
+    fire: 'bg-red-500',
+    water: 'bg-blue-500',
+    electric: 'bg-yellow-400',
+    grass: 'bg-green-500',
+    ice: 'bg-blue-200',
+    fighting: 'bg-red-700',
+    poison: 'bg-purple-500',
+    ground: 'bg-yellow-600',
+    flying: 'bg-indigo-400',
+    psychic: 'bg-pink-500',
+    bug: 'bg-green-400',
+    rock: 'bg-yellow-800',
+    ghost: 'bg-purple-700',
+    dragon: 'bg-indigo-700',
+    dark: 'bg-gray-800',
+    steel: 'bg-gray-500',
+    fairy: 'bg-pink-300'
   }
-  
-  // Retornamos el color correspondiente o gris por defecto si no existe
   return colors[type] || 'bg-gray-400'
 }
 
