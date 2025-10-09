@@ -1,91 +1,47 @@
 // === IMPORTS ===
-// Importamos los hooks necesarios de React
-import { useState, useEffect } from 'react'
+// Importamos los hooks de Context API en lugar de useState locales
 import './App.css'
 
 // === DEBUG TEMPORAL ===
 import './debug-api'
 
-// === IMPORTAR NUESTRA API MODULAR ===
-// Ahora usamos nuestra API profesional en lugar de hacer fetch manualmente
+// === IMPORTAR CONTEXT HOOKS ===
+// Ahora usamos Context API para el estado global
 import { 
-  // Funciones principales de la API
-  getFirstPokemonWithDetails,
-  searchPokemon,
-  filterPokemonByType,
-  extractUniqueTypes,
+  usePokemon,
+  useFavorites,
+  useSelectedPokemon
+} from './context'
+
+// === IMPORTAR UTILIDADES DE LA API ===
+import { 
   convertHeight,
   convertWeight,
   formatPokemonId,
-  
-  // Tipos TypeScript
-  type Pokemon,
-  
-  // Manejo de errores
-  PokemonApiError
+  type Pokemon
 } from './api'
 
 function App() {
-  // === ESTADOS DEL COMPONENTE ===
-  // Estado para almacenar la lista completa de Pokémon con todos sus detalles
-  const [pokemonList, setPokemonList] = useState<Pokemon[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [search, setSearch] = useState('')
-  const [selectedPokemon, setSelectedPokemon] = useState<Pokemon | null>(null)
-  const [selectedType, setSelectedType] = useState<string>('')
-  const [availableTypes, setAvailableTypes] = useState<string[]>([])
-  const [favorites, setFavorites] = useState<number[]>([])
-  const [showFavoritesOnly, setShowFavoritesOnly] = useState(false)
+  // === USAR CONTEXT HOOKS ===
+  // Reemplazamos useState locales con hooks del Context API
+  const { state: pokemonState, actions: pokemonActions } = usePokemon()
+  const { state: favoritesState, actions: favoritesActions } = useFavorites()
+  const { state: selectedPokemonState, actions: selectedPokemonActions } = useSelectedPokemon()
 
-  // === FUNCIÓN PRINCIPAL PARA OBTENER DATOS ===
-  // Ahora usamos nuestra API modular en lugar de fetch manual
-  const fetchPokemonList = async () => {
-    try {
-      // Activamos el estado de carga
-      setLoading(true)
-      
-      // 🚀 NUEVA API: Una sola llamada obtiene todo lo que necesitamos
-      // Antes: múltiples fetch manuales + manejo de errores complejo
-      // Ahora: una función que maneja todo internamente
-      console.log('🚀 Iniciando carga con nueva API...')
-      const pokemonWithDetails = await getFirstPokemonWithDetails(50)
-      
-      // PASO 1: Guardamos los Pokémon
-      setPokemonList(pokemonWithDetails)
-      
-      // PASO 2: Extraemos tipos únicos usando nuestra función utilitaria
-      const uniqueTypes = extractUniqueTypes(pokemonWithDetails)
-      console.log('🏷️ Tipos únicos extraídos:', uniqueTypes)
-      setAvailableTypes(uniqueTypes)
-      
-      // Limpiamos errores si todo sale bien
-      setError(null)
-      console.log('✅ Carga completada exitosamente')
-      
-    } catch (err) {
-      // 🎯 MEJOR MANEJO DE ERRORES: La API ya formatea los mensajes
-      console.error('❌ Error en fetchPokemonList:', err)
-      
-      if (err instanceof PokemonApiError) {
-        // Error específico de nuestra API con mensaje amigable
-        setError(`Error de API: ${err.message}`)
-      } else {
-        // Error genérico
-        setError('Error inesperado al cargar los Pokémon')
-      }
-    } finally {
-      // Siempre desactivamos el loading
-      setLoading(false)
-    }
-  }
+  // === DESTRUCTURING PARA FACILITAR USO ===
+  const {
+    pokemonList,
+    filteredPokemon,
+    availableTypes,
+    loading,
+    error,
+    searchTerm,
+    selectedType,
+    showFavoritesOnly
+  } = pokemonState
 
-  // === EFECTO PARA CARGAR DATOS AL INICIAR ===
-  // useEffect se ejecuta cuando el componente se monta por primera vez
-  // El array vacío [] significa que solo se ejecuta una vez
-  useEffect(() => {
-    fetchPokemonList() // Iniciamos la carga de datos automáticamente
-  }, [])
+  const { favoriteIds } = favoritesState
+  const { selectedPokemon } = selectedPokemonState
 
   // === RENDERIZADO CONDICIONAL: ESTADO DE CARGA ===
   // Si estamos cargando, mostramos un spinner elegante
@@ -111,7 +67,7 @@ function App() {
           <h2 className="text-2xl font-display mb-4">¡Oops!</h2>
           <p className="text-lg">{error}</p>
           <button 
-            onClick={fetchPokemonList} // Botón para reintentar la carga
+            onClick={pokemonActions.refreshData} // Usar action del context
             className="mt-4 px-6 py-2 bg-white text-red-600 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
           >
             Reintentar
@@ -121,49 +77,6 @@ function App() {
     )
   }
 
-  // === FUNCIÓN PARA FILTRAR POKÉMON ===
-  // 🚀 NUEVA LÓGICA: Usamos nuestras funciones especializadas
-  const filteredPokemon = (() => {
-    let result = pokemonList;
-    
-    // Aplicar búsqueda usando nuestra función optimizada
-    if (search.trim() !== '') {
-      result = searchPokemon(result, search);
-      console.log(`🔍 Búsqueda "${search}": ${result.length} resultados`);
-    }
-    
-    // Aplicar filtro de tipo usando nuestra función
-    if (selectedType !== '') {
-      result = filterPokemonByType(result, selectedType);
-      console.log(`🏷️ Filtro tipo "${selectedType}": ${result.length} resultados`);
-    }
-    
-    // Aplicar filtro de favoritos (mantener lógica original)
-    if (showFavoritesOnly) {
-      result = result.filter(pokemon => favorites.includes(pokemon.id));
-      console.log(`⭐ Solo favoritos: ${result.length} resultados`);
-    }
-    
-    return result;
-  })();
-
-  // === FUNCIONES PARA MANEJAR FAVORITOS ===
-  const toggleFavorite = (pokemonId: number) => {
-    setFavorites(prev => 
-      prev.includes(pokemonId) 
-        ? prev.filter(id => id !== pokemonId)
-        : [...prev, pokemonId]
-    )
-  }
-
-  const isFavorite = (pokemonId: number) => favorites.includes(pokemonId)
-
-  // === EXTRAER TIPOS ÚNICOS ===
-  // 🚀 SIMPLIFICADO: Usamos nuestra función utilitaria como backup
-  const typesToShow = availableTypes.length > 0 
-    ? availableTypes 
-    : extractUniqueTypes(pokemonList);
-
   // === RENDERIZADO CONDICIONAL: PANTALLA DE DETALLE ===
   // Si hay un Pokémon seleccionado, mostramos la pantalla de detalle
   if (selectedPokemon) {
@@ -172,7 +85,7 @@ function App() {
         <div className="max-w-2xl mx-auto">
           {/* Botón para volver */}
           <button
-            onClick={() => setSelectedPokemon(null)}
+            onClick={() => selectedPokemonActions.clearSelection()}
             className="mb-6 bg-white text-blue-600 px-6 py-2 rounded-lg font-semibold hover:bg-gray-100 transition-colors flex items-center gap-2"
           >
             ← Tornar a la llista
@@ -198,15 +111,15 @@ function App() {
               
               {/* Estrella destacada */}
               <button
-                onClick={() => toggleFavorite(selectedPokemon.id)}
+                onClick={() => favoritesActions.toggleFavorite(selectedPokemon.id)}
                 className={`w-12 h-12 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center transform hover:scale-110 ${
-                  isFavorite(selectedPokemon.id) 
+                  favoritesActions.isFavorite(selectedPokemon.id) 
                     ? 'bg-gradient-to-r from-yellow-300 to-yellow-400 border-2 border-yellow-500 shadow-yellow-200' 
                     : 'bg-white border-2 border-gray-200 hover:border-gray-300'
                 }`}
               >
                 <span className={`text-2xl transition-all duration-300 ${
-                  isFavorite(selectedPokemon.id) 
+                  favoritesActions.isFavorite(selectedPokemon.id) 
                     ? 'text-yellow-700 drop-shadow-sm' 
                     : 'text-gray-400'
                 }`}>
@@ -328,8 +241,8 @@ function App() {
             <input
               type="text"
               placeholder="Buscar Pokémon..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              value={searchTerm}
+              onChange={(e) => pokemonActions.setSearchTerm(e.target.value)}
               className="w-full max-w-xs px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
             />
           </div>
@@ -341,7 +254,7 @@ function App() {
             {/* === BOTONES TODOS Y FAVORITOS === */}
             <div className="flex gap-3 justify-center mb-4">
               <button
-                onClick={() => setShowFavoritesOnly(false)}
+                onClick={() => pokemonActions.setShowFavoritesOnly(false)}
                 className={`px-6 py-2 rounded-full text-sm font-semibold transition-all duration-200 ${
                   !showFavoritesOnly 
                     ? 'bg-white text-blue-600 shadow-lg' 
@@ -351,24 +264,24 @@ function App() {
                 Tots els Pokémon
               </button>
               <button
-                onClick={() => setShowFavoritesOnly(true)}
+                onClick={() => pokemonActions.setShowFavoritesOnly(true)}
                 className={`px-6 py-2 rounded-full text-sm font-semibold transition-all duration-200 flex items-center gap-2 ${
                   showFavoritesOnly 
                     ? 'bg-white text-blue-600 shadow-lg' 
-                    : favorites.length > 0
+                    : favoriteIds.length > 0
                       ? 'bg-gradient-to-r from-yellow-400 to-yellow-500 text-white shadow-lg hover:from-yellow-500 hover:to-yellow-600 border-2 border-yellow-300'
                       : 'bg-blue-300 text-white hover:bg-white hover:text-blue-600'
                 }`}
               >
-                <span className={favorites.length > 0 && !showFavoritesOnly ? 'animate-pulse' : ''}>⭐</span>
-                Favorits ({favorites.length})
+                <span className={favoriteIds.length > 0 && !showFavoritesOnly ? 'animate-pulse' : ''}>⭐</span>
+                Favorits ({favoriteIds.length})
               </button>
             </div>
 
             <div className="flex gap-2 overflow-x-auto pb-2 justify-center">
               {/* Botón "Todos" los tipos */}
               <button
-                onClick={() => setSelectedType('')}
+                onClick={() => pokemonActions.setSelectedType('')}
                 className={`px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-all duration-200 ${
                   selectedType === '' 
                     ? 'bg-white text-blue-600 underline decoration-2 underline-offset-2' 
@@ -379,11 +292,11 @@ function App() {
               </button>
               
               {/* Botones de tipos */}
-              {typesToShow.length > 0 ? (
-                typesToShow.map((type) => (
+              {availableTypes.length > 0 ? (
+                availableTypes.map((type) => (
                   <button
                     key={type}
-                    onClick={() => setSelectedType(type)}
+                    onClick={() => pokemonActions.setSelectedType(type)}
                     className={`px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-all duration-200 capitalize ${
                       selectedType === type 
                         ? 'bg-white text-blue-600 underline decoration-2 underline-offset-2' 
@@ -409,25 +322,25 @@ function App() {
             - xl: 5 columnas */}
         
         {/* Verificamos si hay Pokémon que coincidan con la búsqueda */}
-        {filteredPokemon.length === 0 && (search.trim() !== '' || selectedType !== '' || showFavoritesOnly) ? (
+        {filteredPokemon.length === 0 && (searchTerm.trim() !== '' || selectedType !== '' || showFavoritesOnly) ? (
           // Mensaje cuando no se encuentran coincidencias
           <div className="text-center py-12">
             <div className="bg-white rounded-xl shadow-lg p-8 mx-auto max-w-md">
               <h3 className="text-xl font-display font-bold text-gray-800 mb-2">
-                {showFavoritesOnly && favorites.length === 0 
+                {showFavoritesOnly && favoriteIds.length === 0 
                   ? "No tens favorits"
                   : "No s'han trobat pokémons"
                 }
               </h3>
               <p className="text-gray-600">
-                {showFavoritesOnly && favorites.length === 0 
+                {showFavoritesOnly && favoriteIds.length === 0 
                   ? "Afegeix alguns Pokémon als teus favorits fent clic a l'estrella ⭐"
                   : showFavoritesOnly
                     ? `No hi ha favorits que coincideixin amb els filtres aplicats`
-                    : search.trim() !== '' && selectedType !== '' 
-                      ? `No hi ha cap pokémon que coincideixi amb "${search}" del tipus ${selectedType}`
-                      : search.trim() !== '' 
-                        ? `No hi ha cap pokémon que coincideixi amb "${search}"`
+                    : searchTerm.trim() !== '' && selectedType !== '' 
+                      ? `No hi ha cap pokémon que coincideixi amb "${searchTerm}" del tipus ${selectedType}`
+                      : searchTerm.trim() !== '' 
+                        ? `No hi ha cap pokémon que coincideixi amb "${searchTerm}"`
                         : `No hi ha cap pokémon del tipus ${selectedType}`
                 }
               </p>
@@ -446,16 +359,16 @@ function App() {
               <button
                 onClick={(e) => {
                   e.stopPropagation() // Evita que se active el detalle del Pokémon
-                  toggleFavorite(pokemon.id)
+                  favoritesActions.toggleFavorite(pokemon.id)
                 }}
                 className={`absolute top-3 right-3 z-10 w-9 h-9 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center transform hover:scale-110 ${
-                  isFavorite(pokemon.id)
+                  favoritesActions.isFavorite(pokemon.id)
                     ? 'bg-gradient-to-r from-yellow-300 to-yellow-400 border-2 border-yellow-500 shadow-yellow-200'
                     : 'bg-white border-2 border-gray-200 hover:border-gray-300'
                 }`}
               >
                 <span className={`text-lg transition-all duration-300 ${
-                  isFavorite(pokemon.id) 
+                  favoritesActions.isFavorite(pokemon.id) 
                     ? 'text-yellow-700 drop-shadow-sm' 
                     : 'text-gray-300 hover:text-gray-400'
                 }`}>
@@ -506,7 +419,7 @@ function App() {
                   {/* === BOTÓN AZUL === */}
                   <div className="mt-3">
                     <button 
-                      onClick={() => setSelectedPokemon(pokemon)}
+                      onClick={() => selectedPokemonActions.selectPokemon(pokemon)}
                       className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-2 rounded-lg transition-colors duration-200"
                     >
                       Ver Detalles
@@ -524,9 +437,9 @@ function App() {
           <p>
             Mostrando {filteredPokemon.length} Pokémon
             {showFavoritesOnly ? ' favorits' : ''}
-            {(search.trim() !== '' || selectedType !== '' || showFavoritesOnly) && ` (de ${pokemonList.length} totals)`}
+            {(searchTerm.trim() !== '' || selectedType !== '' || showFavoritesOnly) && ` (de ${pokemonList.length} totals)`}
             {selectedType !== '' && ` - Tipus: ${selectedType}`}
-            {favorites.length > 0 && !showFavoritesOnly && ` | ${favorites.length} favorits`}
+            {favoriteIds.length > 0 && !showFavoritesOnly && ` | ${favoriteIds.length} favorits`}
           </p>
         </footer>
       </div>
