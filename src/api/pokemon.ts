@@ -2,7 +2,7 @@
 // Este archivo contiene todas las funciones para interactuar con la PokéAPI
 // Cada función representa un endpoint específico y maneja su lógica particular
 
-import { apiRequest, buildUrl, extractIdFromUrl } from './client'
+import { apiRequest, extractIdFromUrl } from './client'
 import type { 
   Pokemon, 
   PokemonListResponse, 

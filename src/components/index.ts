@@ -6,6 +6,7 @@ export { SearchInput } from './SearchInput'
 export { TypeFilter } from './TypeFilter'
 export { LoadingSpinner } from './LoadingSpinner'
 export { ErrorMessage } from './ErrorMessage'
+export { Layout } from './Layout'
 
 // Nota: Aquí se pueden agregar más componentes en el futuro:
 // - PokemonDetail

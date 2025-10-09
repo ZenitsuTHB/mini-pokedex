@@ -1,6 +1,7 @@
 // === POKEMON CARD COMPONENT ===
 // Componente reutilizable para mostrar información de un Pokemon
 
+import { useNavigate } from 'react-router-dom'
 import type { Pokemon } from '../api'
 import { convertHeight, convertWeight, formatPokemonId } from '../api'
 import { useFavorites, useSelectedPokemon } from '../context'
@@ -11,6 +12,7 @@ interface PokemonCardProps {
 }
 
 export function PokemonCard({ pokemon, onClick }: PokemonCardProps) {
+  const navigate = useNavigate()
   const { actions: favoritesActions } = useFavorites()
   const { actions: selectedActions } = useSelectedPokemon()
 
@@ -19,6 +21,7 @@ export function PokemonCard({ pokemon, onClick }: PokemonCardProps) {
       onClick(pokemon)
     } else {
       selectedActions.selectPokemon(pokemon)
+      navigate(`/pokemon/${pokemon.id}`)
     }
   }
 

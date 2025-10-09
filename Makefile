@@ -216,6 +216,28 @@ ci: install-ci lint type-check test build ## 🤖 Pipeline de CI completo
 	@echo "$(GREEN)🤖 Pipeline CI completado$(RESET)"
 
 # ===============================================
+# 🧭 Comandos de Router
+# ===============================================
+
+.PHONY: test-router
+test-router: ## 🧭 Probar navegación del router
+	@echo "$(YELLOW)🧭 Probando navegación del router...$(RESET)"
+	@echo "$(GREEN)✅ HomePage disponible en: http://localhost:5173/$(RESET)"
+	@echo "$(GREEN)✅ Pokemon detail en: http://localhost:5173/pokemon/1$(RESET)"
+	@echo "$(GREEN)✅ Pokemon detail en: http://localhost:5173/pokemon/25$(RESET)"
+	@echo "$(BLUE)💡 Tip: Haz clic en cualquier Pokémon para navegar automáticamente$(RESET)"
+
+.PHONY: test-navigation
+test-navigation: ## 🗺️ Verificar estructura de navegación
+	@echo "$(YELLOW)🗺️ Verificando estructura de navegación...$(RESET)"
+	@echo "$(GREEN)📁 Páginas creadas:$(RESET)"
+	@ls -la src/pages/ 2>/dev/null || echo "$(RED)❌ Directorio pages no encontrado$(RESET)"
+	@echo "$(GREEN)🧭 Router configurado:$(RESET)"
+	@ls -la src/router/ 2>/dev/null || echo "$(RED)❌ Directorio router no encontrado$(RESET)"
+	@echo "$(GREEN)🎨 Layout creado:$(RESET)"
+	@grep -l "Layout" src/components/* 2>/dev/null || echo "$(RED)❌ Layout component no encontrado$(RESET)"
+
+# ===============================================
 # 📋 Comandos por defecto
 # ===============================================
 
