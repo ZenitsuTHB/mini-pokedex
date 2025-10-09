@@ -21,7 +21,7 @@ export function HomePage() {
     return (
       <LoadingSpinner 
         fullScreen 
-        message="Cargando Pokémon..." 
+        message="Loading Pokémon..." 
         size="large"
       />
     )

@@ -6,7 +6,7 @@ interface SearchInputProps {
 }
 
 export function SearchInput({ 
-  placeholder = "Buscar Pokémon...", 
+  placeholder = "Search Pokémon...", 
   className = "" 
 }: SearchInputProps) {
   const { state, actions } = usePokemon()

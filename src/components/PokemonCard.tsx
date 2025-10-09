@@ -1,26 +1,15 @@
 import { useNavigate } from 'react-router-dom'
 import type { Pokemon } from '../api'
-import { convertHeight, convertWeight, formatPokemonId } from '../api'
 import { useFavorites, useSelectedPokemon } from '../context'
 
 interface PokemonCardProps {
   pokemon: Pokemon
-  onClick?: (pokemon: Pokemon) => void
 }
 
-export function PokemonCard({ pokemon, onClick }: PokemonCardProps) {
+export function PokemonCard({ pokemon }: PokemonCardProps) {
   const navigate = useNavigate()
   const { actions: favoritesActions } = useFavorites()
   const { actions: selectedActions } = useSelectedPokemon()
-
-  const handleCardClick = () => {
-    if (onClick) {
-      onClick(pokemon)
-    } else {
-      selectedActions.selectPokemon(pokemon)
-      navigate(`/pokemon/${pokemon.id}`)
-    }
-  }
 
   const handleFavoriteClick = (e: React.MouseEvent) => {
     e.stopPropagation()
@@ -29,8 +18,7 @@ export function PokemonCard({ pokemon, onClick }: PokemonCardProps) {
 
   return (
     <div 
-      className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer transform hover:scale-105 relative overflow-hidden group"
-      onClick={handleCardClick}
+      className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 relative overflow-hidden group"
     >
       <button
         onClick={handleFavoriteClick}
@@ -64,15 +52,11 @@ export function PokemonCard({ pokemon, onClick }: PokemonCardProps) {
         </div>
 
         <div className="space-y-2">
-          <span className="text-sm text-gray-500 font-mono block">
-            #{formatPokemonId(pokemon.id)}
-          </span>
-          
           <h3 className="text-xl font-display font-bold text-gray-800 capitalize">
             {pokemon.name}
           </h3>
 
-          <div className="flex gap-2 justify-center flex-wrap">
+          <div className="flex gap-2 justify-center flex-wrap mb-3">
             {pokemon.types.map((typeInfo, index) => (
               <span
                 key={index}
@@ -83,16 +67,16 @@ export function PokemonCard({ pokemon, onClick }: PokemonCardProps) {
             ))}
           </div>
 
-          <div className="grid grid-cols-2 gap-4 mt-4 text-sm text-gray-600">
-            <div>
-              <span className="block font-medium">Altura</span>
-              <span className="text-gray-800">{convertHeight(pokemon.height)}</span>
-            </div>
-            <div>
-              <span className="block font-medium">Peso</span>
-              <span className="text-gray-800">{convertWeight(pokemon.weight)}</span>
-            </div>
-          </div>
+          <button
+            onClick={(e) => {
+              e.stopPropagation()
+              selectedActions.selectPokemon(pokemon)
+              navigate(`/pokemon/${pokemon.id}`)
+            }}
+            className="px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white text-xs rounded-full transition-colors duration-200"
+          >
+            View Details
+          </button>
         </div>
       </div>
 

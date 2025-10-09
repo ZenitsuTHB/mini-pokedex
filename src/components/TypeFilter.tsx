@@ -10,7 +10,7 @@ export function TypeFilter() {
   return (
     <div className="space-y-4">
       <h3 className="text-blue-100 text-sm font-semibold mb-3">
-        Filtrar por tipo:
+        Filter by type:
       </h3>
       
       <div className="flex gap-3 justify-center mb-4">
@@ -22,7 +22,7 @@ export function TypeFilter() {
               : 'bg-blue-300 text-white hover:bg-white hover:text-blue-600'
           }`}
         >
-          Todos los Pokémon
+          All Pokémon
         </button>
         
         <button
@@ -37,7 +37,7 @@ export function TypeFilter() {
           disabled={favoriteIds.length === 0}
         >
           <span className={favoriteIds.length > 0 && !showFavoritesOnly ? 'animate-pulse' : ''}>⭐</span>
-          Favoritos ({favoriteIds.length})
+          Favorites ({favoriteIds.length})
         </button>
       </div>
 
@@ -50,7 +50,7 @@ export function TypeFilter() {
               : 'bg-blue-400 text-white hover:bg-blue-300 hover:underline hover:decoration-2 hover:underline-offset-2'
           }`}
         >
-          Todos los tipos
+          All Types
         </button>
         
         {availableTypes.length > 0 ? (
@@ -83,7 +83,7 @@ export function TypeFilter() {
             )}
             {showFavoritesOnly && (
               <span className="bg-yellow-400 text-yellow-800 px-2 py-0.5 rounded-full">
-                ⭐ Favoritos
+                ⭐ Favorites
               </span>
             )}
             <button
