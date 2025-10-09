@@ -54,3 +54,8 @@ Debe incluir documentación, tests y buenas prácticas de desarrollo.
 
 ---
 📌 Documento vivo: puede actualizarse conforme evolucione el proyecto.
+
+quiero empezar a modularizar un poco pero paso a paso para poder entender bien como crear componentes en typescript y como funciona bien yo quiero que me enseñes empezando para decirme que es la api rest y como establecemos la api rest respestando una estructura profesional para eso echa un vistazo a la estructura que tengo en analisi.md
+la api rest seguira este plan 
+ESCENARI FUNCIONAL
+Has de construir una aplicació web que permeti explorar Pokémons mitjançant la PokéAPI
