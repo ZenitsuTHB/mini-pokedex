@@ -177,3 +177,6 @@ export function useFavorites() {
   }
   return context
 }
+
+// Evita warning de react-refresh/only-export-components
+useFavorites.displayName = 'useFavorites'

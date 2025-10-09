@@ -240,3 +240,6 @@ export function usePokemon() {
   }
   return context
 }
+
+// Evita warning de react-refresh/only-export-components
+usePokemon.displayName = 'usePokemon'

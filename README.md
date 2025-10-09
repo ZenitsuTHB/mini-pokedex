@@ -115,8 +115,33 @@ make test-coverage   # Reporte de cobertura
 ## 📖 Documentación adicional
 Consulta el archivo `ANALISI.md` para ver el análisis de arquitectura, decisiones técnicas y mejoras futuras.
 
-## 📦 Deploy
-El proyecto puede desplegarse en **Vercel**, **Netlify** o GitHub Pages.
+## � Deploy
+El proyecto está **listo para despliegue** en múltiples plataformas:
+
+### Opciones de Deploy:
+- 🌐 **Vercel** (Recomendado): `make deploy-vercel`
+- 🌐 **Netlify**: `make deploy-netlify` 
+- 🐙 **GitHub Pages**: `make deploy-github-pages`
+- 📦 **Manual**: `make deploy-ready`
+
+### Comandos rápidos:
+```bash
+# Preparar para deploy
+make deploy-ready
+
+# Ver todas las opciones
+make deploy-info
+
+# Deploy en Vercel
+make deploy-vercel
+```
+
+📋 **Guía completa**: Ver `DEPLOY.md` para instrucciones detalladas.
+
+### URLs de Demo:
+Una vez desplegado, estará disponible en URLs como:
+- `https://mini-pokedex-usuario.vercel.app`
+- `https://mini-pokedex-abc123.netlify.app`
 
 ---
 👨‍💻 Desarrollado como parte del reto *Hackató - Mini Pokédex*.

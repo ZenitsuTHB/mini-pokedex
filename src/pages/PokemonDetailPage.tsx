@@ -2,7 +2,7 @@
 // Página detallada de un Pokemon individual
 
 import { useParams, useNavigate } from 'react-router-dom'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { usePokemon, useSelectedPokemon, useFavorites } from '../context'
 import { LoadingSpinner, ErrorMessage } from '../components'
 import { getPokemonDetails } from '../api'
@@ -25,6 +25,22 @@ export function PokemonDetailPage() {
   const [error, setError] = useState<string | null>(null)
   const [pokemon, setPokemon] = useState<Pokemon | null>(selectedPokemon)
 
+  const loadPokemonDetails = useCallback(async (pokemonId: number) => {
+    setLoading(true)
+    setError(null)
+    
+    try {
+      const pokemonData = await getPokemonDetails(pokemonId)
+      selectedActions.selectPokemon(pokemonData)
+      setPokemon(pokemonData)
+    } catch (err) {
+      console.error('Error cargando detalles del Pokémon:', err)
+      setError(err instanceof Error ? err.message : 'Error desconocido')
+    } finally {
+      setLoading(false)
+    }
+  }, [selectedActions])
+
   // === EFECTOS ===
   useEffect(() => {
     if (id) {
@@ -42,23 +58,7 @@ export function PokemonDetailPage() {
         loadPokemonDetails(pokemonId)
       }
     }
-  }, [id, pokemonList, selectedActions])
-
-  const loadPokemonDetails = async (pokemonId: number) => {
-    setLoading(true)
-    setError(null)
-    
-    try {
-      const pokemonData = await getPokemonDetails(pokemonId)
-      selectedActions.selectPokemon(pokemonData)
-      setPokemon(pokemonData)
-    } catch (err) {
-      console.error('Error cargando detalles del Pokémon:', err)
-      setError(err instanceof Error ? err.message : 'Error desconocido')
-    } finally {
-      setLoading(false)
-    }
-  }
+  }, [id, pokemonList, selectedActions, loadPokemonDetails])
 
   // === HANDLERS ===
   const handleGoBack = () => {

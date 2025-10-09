@@ -68,3 +68,6 @@ export function useSelectedPokemon() {
   }
   return context
 }
+
+// Evita warning de react-refresh/only-export-components
+useSelectedPokemon.displayName = 'useSelectedPokemon'

@@ -1,0 +1,4 @@
+# Construir para producción
+npm run build
+
+# El directorio dist/ contiene los archivos optimizados para producción

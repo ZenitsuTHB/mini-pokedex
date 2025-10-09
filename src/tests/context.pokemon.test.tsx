@@ -79,7 +79,7 @@ const localStorageMock = {
   clear: vi.fn(),
 }
 
-// @ts-ignore
+// @ts-expect-error - Mock para localStorage en tests
 global.localStorage = localStorageMock
 
 describe('🎮 PokemonContext', () => {

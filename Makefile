@@ -238,6 +238,71 @@ test-navigation: ## 🗺️ Verificar estructura de navegación
 	@grep -l "Layout" src/components/* 2>/dev/null || echo "$(RED)❌ Layout component no encontrado$(RESET)"
 
 # ===============================================
+# 🚀 Despliegue y Deploy
+# ===============================================
+
+.PHONY: deploy-ready
+deploy-ready: clean test-all build ## 🚀 Preparar para despliegue
+	@echo "$(GREEN)🚀 Proyecto listo para despliegue$(RESET)"
+	@echo "$(BLUE)📦 Build generado en dist/$(RESET)"
+	@echo "$(BLUE)📋 Archivos listos para deploy:$(RESET)"
+	@ls -la dist/ 2>/dev/null || echo "$(RED)❌ Build no encontrado$(RESET)"
+
+.PHONY: deploy-vercel
+deploy-vercel: deploy-ready ## 🌐 Desplegar en Vercel
+	@echo "$(YELLOW)🌐 Desplegando en Vercel...$(RESET)"
+	@if command -v vercel >/dev/null 2>&1; then \
+		vercel --prod; \
+	else \
+		echo "$(RED)❌ Vercel CLI no instalado. Instalar con: npm i -g vercel$(RESET)"; \
+		echo "$(BLUE)💡 O usar la interfaz web: https://vercel.com$(RESET)"; \
+	fi
+
+.PHONY: deploy-netlify
+deploy-netlify: deploy-ready ## 🌐 Desplegar en Netlify
+	@echo "$(YELLOW)🌐 Desplegando en Netlify...$(RESET)"
+	@if command -v netlify >/dev/null 2>&1; then \
+		netlify deploy --prod --dir dist; \
+	else \
+		echo "$(RED)❌ Netlify CLI no instalado. Instalar con: npm i -g netlify-cli$(RESET)"; \
+		echo "$(BLUE)💡 O usar drag & drop: https://app.netlify.com/drop$(RESET)"; \
+	fi
+
+.PHONY: deploy-github-pages
+deploy-github-pages: ## 🐙 Configurar para GitHub Pages
+	@echo "$(YELLOW)🐙 Configurando GitHub Pages...$(RESET)"
+	@echo "$(BLUE)📋 Pasos para GitHub Pages:$(RESET)"
+	@echo "$(GREEN)1. Ir a Settings > Pages en tu repo$(RESET)"
+	@echo "$(GREEN)2. Source: GitHub Actions$(RESET)"
+	@echo "$(GREEN)3. Usar el workflow en .github/workflows/deploy.yml$(RESET)"
+	@echo "$(BLUE)💡 El workflow se ejecutará automáticamente en push a main$(RESET)"
+
+.PHONY: deploy-info
+deploy-info: ## 📋 Información de opciones de deploy
+	@echo "$(BLUE)📋 Opciones de despliegue disponibles:$(RESET)"
+	@echo ""
+	@echo "$(GREEN)🌐 Vercel (Recomendado):$(RESET)"
+	@echo "  • Comando: make deploy-vercel"
+	@echo "  • CLI: npm i -g vercel"
+	@echo "  • Web: https://vercel.com"
+	@echo "  • Ventajas: Automático, fast, CDN global"
+	@echo ""
+	@echo "$(GREEN)🌐 Netlify:$(RESET)"
+	@echo "  • Comando: make deploy-netlify"
+	@echo "  • CLI: npm i -g netlify-cli"
+	@echo "  • Drag & drop: https://app.netlify.com/drop"
+	@echo "  • Ventajas: Fácil, funciones serverless"
+	@echo ""
+	@echo "$(GREEN)🐙 GitHub Pages:$(RESET)"
+	@echo "  • Comando: make deploy-github-pages"
+	@echo "  • Requiere: GitHub Actions workflow"
+	@echo "  • Ventajas: Gratis, integrado con GitHub"
+	@echo ""
+	@echo "$(YELLOW)📦 Manual (cualquier hosting):$(RESET)"
+	@echo "  • Build: make build"
+	@echo "  • Subir carpeta: dist/"
+
+# ===============================================
 # 📋 Comandos por defecto
 # ===============================================
 

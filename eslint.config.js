@@ -19,5 +19,12 @@ export default defineConfig([
       ecmaVersion: 2020,
       globals: globals.browser,
     },
+    rules: {
+      // Permitir exports de hooks en archivos de contexto
+      'react-refresh/only-export-components': [
+        'warn',
+        { allowConstantExport: true, allowExportNames: ['usePokemon', 'useFavorites', 'useSelectedPokemon'] }
+      ]
+    }
   },
 ])
