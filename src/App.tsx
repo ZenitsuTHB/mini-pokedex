@@ -1,112 +1,81 @@
+// === IMPORTS ===
 // Importamos los hooks necesarios de React
 import { useState, useEffect } from 'react'
 import './App.css'
 
-// === DEFINICIÓN DE TIPOS/INTERFACES ===
-// Define la estructura de un Pokémon completo con toda la información que necesitamos
-interface Pokemon {
-  id: number              // ID único del Pokémon (ej: 1, 2, 3...)
-  name: string           // Nombre del Pokémon (ej: "bulbasaur")
-  url: string            // URL de la API para obtener más detalles
-  sprites: {             // Objeto que contiene las imágenes del Pokémon
-    front_default: string // URL de la imagen frontal por defecto
-  }
-  types: Array<{         // Array de tipos del Pokémon (puede tener 1 o 2 tipos)
-    type: {
-      name: string       // Nombre del tipo (ej: "grass", "poison")
-    }
-  }>
-  height: number         // Altura del Pokémon en decímetros
-  weight: number         // Peso del Pokémon en hectogramos
-  stats: Array<{         // Array de estadísticas del Pokémon
-    base_stat: number    // Valor base de la estadística
-    stat: {
-      name: string       // Nombre de la estadística (hp, attack, defense, etc.)
-    }
-  }>
-}
+// === DEBUG TEMPORAL ===
+import './debug-api'
 
-// Define la estructura de la respuesta de la API cuando pedimos la lista inicial
-interface PokemonListResponse {
-  results: Array<{       // Array con información básica de cada Pokémon
-    name: string         // Solo el nombre
-    url: string          // URL para obtener los detalles completos
-  }>
-}
+// === IMPORTAR NUESTRA API MODULAR ===
+// Ahora usamos nuestra API profesional en lugar de hacer fetch manualmente
+import { 
+  // Funciones principales de la API
+  getFirstPokemonWithDetails,
+  searchPokemon,
+  filterPokemonByType,
+  extractUniqueTypes,
+  convertHeight,
+  convertWeight,
+  formatPokemonId,
+  
+  // Tipos TypeScript
+  type Pokemon,
+  
+  // Manejo de errores
+  PokemonApiError
+} from './api'
 
 function App() {
   // === ESTADOS DEL COMPONENTE ===
   // Estado para almacenar la lista completa de Pokémon con todos sus detalles
   const [pokemonList, setPokemonList] = useState<Pokemon[]>([])
-  
-  // Estado para controlar si estamos cargando datos (muestra spinner)
   const [loading, setLoading] = useState(true)
-  
-  // Estado para manejar errores (muestra mensaje de error si algo falla)
   const [error, setError] = useState<string | null>(null)
-
-  // Estado para el término de búsqueda
   const [search, setSearch] = useState('')
-
-  // Estado para el Pokémon seleccionado (pantalla de detalle)
   const [selectedPokemon, setSelectedPokemon] = useState<Pokemon | null>(null)
-
-  // Estado para el filtro de tipo seleccionado
   const [selectedType, setSelectedType] = useState<string>('')
-
-  // Estado para la lista de tipos únicos disponibles
   const [availableTypes, setAvailableTypes] = useState<string[]>([])
-
-  // Estado para cargar detalles de un Pokémon específico
-  const [loadingDetail, setLoadingDetail] = useState(false)
-
-  // Estado para los Pokémon favoritos (almacena los IDs)
   const [favorites, setFavorites] = useState<number[]>([])
-
-  // Estado para mostrar solo favoritos
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false)
 
   // === FUNCIÓN PRINCIPAL PARA OBTENER DATOS ===
+  // Ahora usamos nuestra API modular en lugar de fetch manual
   const fetchPokemonList = async () => {
     try {
       // Activamos el estado de carga
       setLoading(true)
       
-      // PASO 1: Obtenemos la lista básica de 50 Pokémon desde la API
-      // Esta llamada solo nos da nombres y URLs, no los detalles completos
-      const response = await fetch('https://pokeapi.co/api/v2/pokemon?limit=50')
-      const data: PokemonListResponse = await response.json()
+      // 🚀 NUEVA API: Una sola llamada obtiene todo lo que necesitamos
+      // Antes: múltiples fetch manuales + manejo de errores complejo
+      // Ahora: una función que maneja todo internamente
+      console.log('🚀 Iniciando carga con nueva API...')
+      const pokemonWithDetails = await getFirstPokemonWithDetails(50)
       
-      // PASO 2: Para cada Pokémon de la lista, hacemos una llamada individual
-      // para obtener sus detalles completos (imagen, tipos, etc.)
-      // Promise.all ejecuta todas las llamadas en paralelo para mayor eficiencia
-      const pokemonDetails = await Promise.all(
-        data.results.map(async (pokemon) => {
-          // Llamada individual para obtener detalles de cada Pokémon
-          const detailResponse = await fetch(pokemon.url)
-          const detail = await detailResponse.json()
-          return detail // Retornamos el objeto completo con todos los detalles
-        })
-      )
+      // PASO 1: Guardamos los Pokémon
+      setPokemonList(pokemonWithDetails)
       
-      // PASO 3: Guardamos todos los detalles en nuestro estado
-      setPokemonList(pokemonDetails)
-      
-      // PASO 4: Extraemos todos los tipos únicos para el filtro
-      const allTypes = pokemonDetails.flatMap(pokemon => 
-        pokemon.types.map((type: { type: { name: string } }) => type.type.name)
-      )
-      const uniqueTypes = [...new Set(allTypes)].sort()
-      console.log('Tipos únicos encontrados:', uniqueTypes) // Debug
+      // PASO 2: Extraemos tipos únicos usando nuestra función utilitaria
+      const uniqueTypes = extractUniqueTypes(pokemonWithDetails)
+      console.log('🏷️ Tipos únicos extraídos:', uniqueTypes)
       setAvailableTypes(uniqueTypes)
       
-      setError(null) // Limpiamos cualquier error previo si todo sale bien
+      // Limpiamos errores si todo sale bien
+      setError(null)
+      console.log('✅ Carga completada exitosamente')
+      
     } catch (err) {
-      // Si algo falla, mostramos un mensaje de error amigable
-      setError('Error al cargar los Pokémon')
-      console.error('Error:', err) // Log técnico para debugging
+      // 🎯 MEJOR MANEJO DE ERRORES: La API ya formatea los mensajes
+      console.error('❌ Error en fetchPokemonList:', err)
+      
+      if (err instanceof PokemonApiError) {
+        // Error específico de nuestra API con mensaje amigable
+        setError(`Error de API: ${err.message}`)
+      } else {
+        // Error genérico
+        setError('Error inesperado al cargar los Pokémon')
+      }
     } finally {
-      // Siempre desactivamos el loading, haya error o no
+      // Siempre desactivamos el loading
       setLoading(false)
     }
   }
@@ -153,13 +122,30 @@ function App() {
   }
 
   // === FUNCIÓN PARA FILTRAR POKÉMON ===
-  // Filtra los Pokémon basándose en el término de búsqueda y tipo seleccionado
-  const filteredPokemon = pokemonList.filter(pokemon => {
-    const matchesSearch = pokemon.name.toLowerCase().includes(search.toLowerCase())
-    const matchesType = selectedType === '' || pokemon.types.some(type => type.type.name === selectedType)
-    const matchesFavorites = !showFavoritesOnly || favorites.includes(pokemon.id)
-    return matchesSearch && matchesType && matchesFavorites
-  })
+  // 🚀 NUEVA LÓGICA: Usamos nuestras funciones especializadas
+  const filteredPokemon = (() => {
+    let result = pokemonList;
+    
+    // Aplicar búsqueda usando nuestra función optimizada
+    if (search.trim() !== '') {
+      result = searchPokemon(result, search);
+      console.log(`🔍 Búsqueda "${search}": ${result.length} resultados`);
+    }
+    
+    // Aplicar filtro de tipo usando nuestra función
+    if (selectedType !== '') {
+      result = filterPokemonByType(result, selectedType);
+      console.log(`🏷️ Filtro tipo "${selectedType}": ${result.length} resultados`);
+    }
+    
+    // Aplicar filtro de favoritos (mantener lógica original)
+    if (showFavoritesOnly) {
+      result = result.filter(pokemon => favorites.includes(pokemon.id));
+      console.log(`⭐ Solo favoritos: ${result.length} resultados`);
+    }
+    
+    return result;
+  })();
 
   // === FUNCIONES PARA MANEJAR FAVORITOS ===
   const toggleFavorite = (pokemonId: number) => {
@@ -172,15 +158,11 @@ function App() {
 
   const isFavorite = (pokemonId: number) => favorites.includes(pokemonId)
 
-  // === EXTRAER TIPOS ÚNICOS COMO BACKUP ===
-  // Si availableTypes está vacío, extraemos los tipos directamente
-  const typesFromPokemonList = pokemonList.length > 0 
-    ? [...new Set(pokemonList.flatMap(pokemon => 
-        pokemon.types.map(type => type.type.name)
-      ))].sort()
-    : []
-  
-  const typesToShow = availableTypes.length > 0 ? availableTypes : typesFromPokemonList
+  // === EXTRAER TIPOS ÚNICOS ===
+  // 🚀 SIMPLIFICADO: Usamos nuestra función utilitaria como backup
+  const typesToShow = availableTypes.length > 0 
+    ? availableTypes 
+    : extractUniqueTypes(pokemonList);
 
   // === RENDERIZADO CONDICIONAL: PANTALLA DE DETALLE ===
   // Si hay un Pokémon seleccionado, mostramos la pantalla de detalle
@@ -207,7 +189,7 @@ function App() {
               {/* Título centrado */}
               <div className="flex-1 text-center">
                 <span className="text-lg text-gray-500 font-mono block mb-1">
-                  #{selectedPokemon.id.toString().padStart(3, '0')}
+                  #{formatPokemonId(selectedPokemon.id)}
                 </span>
                 <h1 className="text-4xl font-display font-bold text-gray-800 capitalize">
                   {selectedPokemon.name}
@@ -258,18 +240,19 @@ function App() {
                   ))}
                 </div>
 
-                {/* Estadísticas físicas */}
+                {/* === ESTADÍSTICAS FÍSICAS === */}
+                {/* 🚀 NUEVA LÓGICA: Usamos funciones de conversión de nuestra API */}
                 <div className="grid grid-cols-2 gap-6 max-w-md mx-auto mb-8">
                   <div className="bg-gray-50 rounded-lg p-4">
                     <h3 className="text-sm font-semibold text-gray-600 mb-1">Alçada</h3>
                     <p className="text-2xl font-bold text-gray-800">
-                      {(selectedPokemon.height / 10).toFixed(1)} m
+                      {convertHeight(selectedPokemon.height).toFixed(1)} m
                     </p>
                   </div>
                   <div className="bg-gray-50 rounded-lg p-4">
                     <h3 className="text-sm font-semibold text-gray-600 mb-1">Pes</h3>
                     <p className="text-2xl font-bold text-gray-800">
-                      {(selectedPokemon.weight / 10).toFixed(1)} kg
+                      {convertWeight(selectedPokemon.weight).toFixed(1)} kg
                     </p>
                   </div>
                 </div>
@@ -321,16 +304,6 @@ function App() {
               </div>
             </div>
           </div>
-
-          {/* Spinner de carga si se está cargando detalle */}
-          {loadingDetail && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-              <div className="bg-white rounded-lg p-6 text-center">
-                <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-                <p className="text-gray-700">Carregant detalls...</p>
-              </div>
-            </div>
-          )}
         </div>
       </div>
     )
@@ -505,8 +478,9 @@ function App() {
                 <div className="text-center">
                   
                   {/* Número del Pokémon con formato (ej: #001, #025) */}
+                  {/* 🚀 NUEVA LÓGICA: Usamos función de formateo de nuestra API */}
                   <span className="text-sm text-gray-500 font-mono">
-                    #{pokemon.id.toString().padStart(3, '0')}
+                    #{formatPokemonId(pokemon.id)}
                   </span>
                   
                   {/* Nombre del Pokémon capitalizado */}

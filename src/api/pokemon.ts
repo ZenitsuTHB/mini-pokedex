@@ -22,12 +22,13 @@ export async function getPokemonList(
   limit: number = 50, 
   offset: number = 0
 ): Promise<PokemonListResponse> {
-  console.log(`Fetching Pokemon list: limit=${limit}, offset=${offset}`)
+  console.log(`📋 Fetching Pokemon list: limit=${limit}, offset=${offset}`)
   
-  const endpoint = buildUrl('/pokemon', { limit, offset })
+  // Construir endpoint con parámetros
+  const endpoint = `/pokemon?limit=${limit}&offset=${offset}`
   const response = await apiRequest<PokemonListResponse>(endpoint)
   
-  console.log(`Pokemon list fetched: ${response.results.length} items`)
+  console.log(`✅ Pokemon list fetched: ${response.results.length} items`)
   return response
 }
 

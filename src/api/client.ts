@@ -29,7 +29,10 @@ export async function apiRequest<T>(
   endpoint: string, 
   options: RequestInit = {}
 ): Promise<T> {
-  const url = `${API_CONFIG.baseUrl}${endpoint}`
+  // Construir URL correctamente
+  const url = endpoint.startsWith('http') 
+    ? endpoint 
+    : `${API_CONFIG.baseUrl}${endpoint}`
   
   // Configuración por defecto de la petición
   const defaultOptions: RequestInit = {
@@ -137,13 +140,22 @@ export async function apiRequest<T>(
 
 // Función para construir URLs con parámetros de consulta
 export function buildUrl(endpoint: string, params: Record<string, string | number> = {}): string {
-  const url = new URL(endpoint, API_CONFIG.baseUrl)
+  // Si el endpoint ya es absoluto, lo usamos directamente
+  if (endpoint.startsWith('http')) {
+    const url = new URL(endpoint)
+    Object.entries(params).forEach(([key, value]) => {
+      url.searchParams.append(key, String(value))
+    })
+    return url.toString()
+  }
   
+  // Si es relativo, lo construimos desde baseUrl
+  const url = new URL(endpoint, API_CONFIG.baseUrl)
   Object.entries(params).forEach(([key, value]) => {
     url.searchParams.append(key, String(value))
   })
   
-  return url.toString().replace(API_CONFIG.baseUrl, '') // Retornamos solo el endpoint relativo
+  return url.toString()
 }
 
 // Función para extraer ID de una URL de la PokéAPI
