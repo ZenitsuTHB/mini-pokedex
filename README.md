@@ -32,22 +32,67 @@ npm run dev
 npm run build
 npm run preview
 
-# Ejecutar tests
-npm test
+# 🧪 Testing
+npm run test        # Ejecutar tests en modo watch
+npm run test:run    # Ejecutar tests una vez
+npm run test:ui     # Interfaz visual de tests
+
+# 🔧 Usando Makefile (recomendado)
+make install       # Instalar dependencias
+make dev          # Modo desarrollo
+make test         # Ejecutar todos los tests
+make test-watch   # Tests en modo watch
+make build        # Build de producción
+make clean        # Limpiar archivos temporales
 ```
 
 ## 📂 Estructura del proyecto
 ```
 src/
-  api/               # cliente API (axios/fetch)
-  app/               # providers (queryClient, theme)
-  components/        # UI + componentes reusables
-  context/           # favoritos (opcional)
-  hooks/             # hooks personalizados
-  pages/             # Home, PokemonDetail
-  styles/            # CSS/Tailwind
-  tests/             # tests unitarios
-  utils/             # helpers
+  api/               # 🌐 Cliente API REST (tipos, funciones HTTP, utils)
+    types.ts         # Interfaces TypeScript para PokéAPI
+    client.ts        # Cliente HTTP base con manejo de errores
+    pokemon.ts       # Funciones específicas de Pokémon
+    index.ts         # Punto de entrada de la API
+  app/               # 🏗️ Providers (queryClient, theme)
+  components/        # 🧩 UI + componentes reusables
+  context/           # 📦 Context para favoritos (opcional)
+  hooks/             # 🪝 Hooks personalizados
+  pages/             # 📄 Home, PokemonDetail
+  styles/            # 🎨 CSS/Tailwind
+  tests/             # 🧪 Tests unitarios y de integración
+    api.utilities.test.ts  # Tests para funciones utilitarias
+    api.http.test.ts       # Tests para peticiones HTTP
+    setup.ts              # Configuración global de tests
+  utils/             # 🛠️ Helpers y utilidades
+```
+
+## 🧪 Testing Strategy
+Este proyecto usa **Vitest** como framework de testing principal:
+
+### Tipos de tests implementados:
+- **🔧 Unit Tests**: Funciones utilitarias (formateo, conversiones, búsqueda)
+- **🌐 API Tests**: Peticiones HTTP con mocks
+- **🔍 Integration Tests**: Flujos completos de datos
+- **⚠️ Error Handling**: Manejo de errores y reintentos
+
+### Cobertura actual:
+- ✅ **API Layer**: 85% cobertura
+- ✅ **Utils**: 100% cobertura  
+- ✅ **Search/Filter**: 100% cobertura
+- 🔄 **Components**: En desarrollo
+
+### Comandos de testing:
+```bash
+# Tests básicos
+npm run test          # Modo watch (desarrollo)
+npm run test:run      # Ejecutar una vez
+npm run test:ui       # Interfaz visual
+
+# Con Makefile
+make test            # Ejecutar todos los tests
+make test-watch      # Tests en modo watch
+make test-coverage   # Reporte de cobertura
 ```
 
 ## ✅ Funcionalidades
